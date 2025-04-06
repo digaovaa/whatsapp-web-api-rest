@@ -1,15 +1,17 @@
-import {
-    downloadContentFromMessage,
-    downloadMediaMessage,
-    getContentType,
-    proto,
-    WAMessageKey
-} from '@whiskeysockets/baileys';
+import {downloadMediaMessage, getContentType, proto, WAMessageKey} from '@whiskeysockets/baileys';
 import {MessageEvent} from '../types';
 import logger from '../../utils/logger';
-import {createWriteStream} from "node:fs";
+import {createWriteStream, WriteStream} from "node:fs";
 import {v4} from "uuid";
 import {getMimeType} from "../../utils/getMimeType";
+
+const mediaMessagesTypes = [
+    "audioMessage",
+    "videoMessage",
+    "imageMessage",
+    "stickerMessage",
+    "documentMessage"
+]
 
 /**
  * Utility class for processing WhatsApp messages
@@ -46,76 +48,46 @@ export class MessageProcessor {
             const messageType = getContentType(messageContent);
             const content: any = {};
 
+            if (messageType && mediaMessagesTypes.includes(messageType)) {
+                let mimeType = ""
 
-            if (messageType === "imageMessage") {
-                const stream = await downloadMediaMessage(
-                    message,
-                    'stream',
-                    {},
-                    {
-                        logger,
-                        reuploadRequest: sock.updateMediaMessage
-                    }
-                )
-                const writeStream = createWriteStream('./' + v4() + '.jpeg')
-                stream.pipe(writeStream)
-            }
+                if (messageType === "imageMessage") {
+                    mimeType = 'jpeg'
+                }
 
+                if (messageType === "stickerMessage") {
+                    mimeType = 'webp'
+                }
 
-            if (messageType === "stickerMessage") {
-                const stream = await downloadMediaMessage(
-                    message,
-                    'stream',
-                    {},
-                    {
-                        logger,
-                        reuploadRequest: sock.updateMediaMessage
-                    }
-                )
-                const writeStream = createWriteStream('./' + v4() + '.webp')
-                stream.pipe(writeStream)
-            }
+                if (messageType === "videoMessage") {
+                    mimeType = 'mp4'
+                }
 
-            if (messageType === "videoMessage") {
-                const stream = await downloadMediaMessage(
-                    message,
-                    'stream',
-                    {},
-                    {
-                        logger,
-                        reuploadRequest: sock.updateMediaMessage
-                    }
-                )
-                const writeStream = createWriteStream('./' + v4() + '.mp4')
-                stream.pipe(writeStream)
-            }
+                if (messageType === "audioMessage") {
+                    mimeType = 'ogg'
+                }
 
-            if (messageType === "audioMessage") {
-                const stream = await downloadMediaMessage(
-                    message,
-                    'stream',
-                    {},
-                    {
-                        logger,
-                        reuploadRequest: sock.updateMediaMessage
-                    }
-                )
-                const writeStream = createWriteStream('./audio-' + v4() + '.ogg')
-                stream.pipe(writeStream)
-            }
+                if (messageType === "documentMessage" && messageContent.documentMessage) {
+                    mimeType = getMimeType(messageContent.documentMessage)
+                }
 
-            if (messageType === "documentMessage" && messageContent.documentMessage && messageContent.documentMessage.mimetype) {
-                const stream = await downloadMediaMessage(
-                    message,
-                    'stream',
-                    {},
-                    {
-                        logger,
-                        reuploadRequest: sock.updateMediaMessage
-                    }
-                )
-                const writeStream = createWriteStream('./doc-' + v4() + "." + getMimeType(messageContent.documentMessage))
-                stream.pipe(writeStream)
+                if (mimeType.length) {
+                    const filepath = './' + v4() + "." + mimeType;
+
+                    const stream = await downloadMediaMessage(
+                        message,
+                        'stream',
+                        {},
+                        {
+                            logger,
+                            reuploadRequest: sock.updateMediaMessage
+                        }
+                    )
+
+                    stream.pipe(createWriteStream(filepath))
+                    // TODO: Upload the image to bucket and return the public link
+                    content.filename = filepath
+                }
             }
 
             // Extract quoted message if available
