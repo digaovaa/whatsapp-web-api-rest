@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
 import {WhatsAppService} from '../services/WhatsAppService';
 import {sessionManager} from '../core/sessions/SessionManager';
-import {SessionStatus} from '../core/types';
 import logger from '../utils/logger';
 
 /**

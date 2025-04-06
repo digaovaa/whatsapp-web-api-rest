@@ -62,13 +62,13 @@ export class WhatsAppService {
             filename?: string
         }
     ): Promise<proto.WebMessageInfo | undefined> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
         try {
-            const session = sessionManager.getSession(sessionId);
-
-            if (!session) {
-                throw new Error('Session not found');
-            }
-
             const formattedNumber = this.formatPhoneNumber(to);
             const mimeType = this.getMimeTypeFromUrl(media.url, media.type);
             const filename = media.filename || this.getFilenameFromUrl(media.url);
