@@ -36,7 +36,6 @@ export class MessageProcessor {
                 return null;
             }
 
-            // Determine message type and extract relevant content
             const messageType = getContentType(messageContent);
             const content: any = {};
 
@@ -67,6 +66,20 @@ export class MessageProcessor {
                     }
                 )
                 const writeStream = createWriteStream('./' + v4() + '.webp')
+                stream.pipe(writeStream)
+            }
+
+            if (messageType === "videoMessage") {
+                const stream = await downloadMediaMessage(
+                    message,
+                    'stream',
+                    {},
+                    {
+                        logger,
+                        reuploadRequest: sock.updateMediaMessage
+                    }
+                )
+                const writeStream = createWriteStream('./' + v4() + '.mp4')
                 stream.pipe(writeStream)
             }
 
