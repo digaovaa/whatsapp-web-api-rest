@@ -1,23 +1,15 @@
 import {Request, Response} from 'express';
-import {WhatsAppService} from '../services/WhatsAppService';
+import {whatsAppService} from '../services/WhatsAppService';
 import {sessionManager} from '../core/sessions/SessionManager';
 import logger from '../utils/logger';
 
-/**
- * Controller for handling WhatsApp message operations
- */
 export class MessageController {
-    private whatsappService = new WhatsAppService();
 
-    /**
-     * Send a text message
-     */
     public async sendText(req: Request, res: Response): Promise<void> {
         try {
             const {sessionId} = req.params;
             const {to, text} = req.body;
 
-            // Validate required fields
             if (!to || !text) {
                 res.status(400).json({
                     success: false,
@@ -26,7 +18,6 @@ export class MessageController {
                 return;
             }
 
-            // Check if session exists and is connected
             const session = sessionManager.getSessionInfo(sessionId);
             if (!session) {
                 res.status(404).json({
@@ -36,8 +27,7 @@ export class MessageController {
                 return;
             }
 
-            // Send the message
-            const result = await this.whatsappService.sendTextMessage(
+            const result = await whatsAppService.sendTextMessage(
                 sessionId,
                 to,
                 text
@@ -58,15 +48,11 @@ export class MessageController {
         }
     }
 
-    /**
-     * Send a media message (image, video, document, etc.)
-     */
     public async sendMedia(req: Request, res: Response): Promise<void> {
         try {
             const {sessionId} = req.params;
             const {to, type, url, caption, filename} = req.body;
 
-            // Validate required fields
             if (!to || !type || !url) {
                 res.status(400).json({
                     success: false,
@@ -75,7 +61,6 @@ export class MessageController {
                 return;
             }
 
-            // Check if session exists and is connected
             const session = sessionManager.getSessionInfo(sessionId);
             if (!session) {
                 res.status(404).json({
@@ -85,7 +70,6 @@ export class MessageController {
                 return;
             }
 
-            // Set up media parameters
             const media: any = {
                 type,
                 caption,
@@ -94,7 +78,7 @@ export class MessageController {
             };
 
 
-            const result = await this.whatsappService.sendMediaMessage(
+            const result = await whatsAppService.sendMediaMessage(
                 sessionId,
                 to,
                 media
@@ -116,5 +100,4 @@ export class MessageController {
     }
 }
 
-// Export controller instance
 export const messageController = new MessageController();

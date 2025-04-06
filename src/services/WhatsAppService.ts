@@ -4,17 +4,8 @@ import logger from '../utils/logger';
 import mime from "mime-types";
 import {AnyMediaMessageContent, proto, WAMediaUpload} from "@whiskeysockets/baileys";
 
-/**
- * Service for WhatsApp messaging functionality
- */
 export class WhatsAppService {
-    /**
-     * Send a text message
-     * @param sessionId The session ID to use
-     * @param to Recipient phone number
-     * @param text Message content
-     * @returns Message send result
-     */
+
     public async sendTextMessage(
         sessionId: string,
         to: string,
@@ -27,15 +18,12 @@ export class WhatsAppService {
                 throw new Error('Session not found');
             }
 
-            // Format the phone number (ensure it has the correct format with country code)
             const formattedNumber = this.formatPhoneNumber(to);
 
-            // Send the message
             const result = await session.socket.sendMessage(formattedNumber, {
                 text
             });
 
-            // Update last used timestamp
             session.info.lastUsed = new Date();
 
             return result;
@@ -45,13 +33,6 @@ export class WhatsAppService {
         }
     }
 
-    /**
-     * Send a media message (image, video, document, etc.) from a URL
-     * @param sessionId The session ID to use
-     * @param to Recipient phone number
-     * @param media Media content configuration
-     * @returns Message send result
-     */
     public async sendMediaMessage(
         sessionId: string,
         to: string,
@@ -124,7 +105,6 @@ export class WhatsAppService {
                     throw new Error(`Unsupported media type: ${media.type}`);
             }
 
-            // Send the message using the proper Baileys typing
             const result = await session.socket.sendMessage(formattedNumber, content);
 
             session.info.lastUsed = new Date();
@@ -136,12 +116,6 @@ export class WhatsAppService {
         }
     }
 
-    /**
-     * Get MIME type from URL
-     * @param url URL of the media
-     * @param type Media type (used as fallback)
-     * @returns MIME type string
-     */
     private getMimeTypeFromUrl(url: string, type: string): string {
         const fallbackMimeTypes: Record<string, string> = {
             'image': 'image/jpeg',
@@ -171,11 +145,6 @@ export class WhatsAppService {
         }
     }
 
-    /**
-     * Extract filename from URL
-     * @param url URL of the media
-     * @returns Filename string
-     */
     private getFilenameFromUrl(url: string): string {
         try {
             const urlObj = new URL(url);
@@ -189,16 +158,6 @@ export class WhatsAppService {
         }
     }
 
-    /**
-     * Send a location message
-     * @param sessionId The session ID to use
-     * @param to Recipient phone number
-     * @param latitude Latitude coordinate
-     * @param longitude Longitude coordinate
-     * @param name Optional location name
-     * @param address Optional location address
-     * @returns Message send result
-     */
     public async sendLocationMessage(
         sessionId: string,
         to: string,
@@ -218,10 +177,8 @@ export class WhatsAppService {
                 throw new Error(`Session is not connected (current status: ${session.info.status})`);
             }
 
-            // Format the phone number
             const formattedNumber = this.formatPhoneNumber(to);
 
-            // Prepare location message
             const content = {
                 location: {
                     degreesLatitude: latitude,
@@ -231,10 +188,7 @@ export class WhatsAppService {
                 }
             };
 
-            // Send the message
             const result = await session.socket.sendMessage(formattedNumber, content);
-
-            // Update last used timestamp
             session.info.lastUsed = new Date();
 
             return result;
@@ -244,13 +198,6 @@ export class WhatsAppService {
         }
     }
 
-    /**
-     * Send a contact card message
-     * @param sessionId The session ID to use
-     * @param to Recipient phone number
-     * @param contact Contact information
-     * @returns Message send result
-     */
     public async sendContactMessage(
         sessionId: string,
         to: string,
@@ -272,10 +219,8 @@ export class WhatsAppService {
                 throw new Error(`Session is not connected (current status: ${session.info.status})`);
             }
 
-            // Format the phone number
             const formattedNumber = this.formatPhoneNumber(to);
 
-            // Prepare vCard data
             const vcard = `BEGIN:VCARD
 VERSION:3.0
 FN:${contact.fullName}
@@ -286,7 +231,6 @@ ${contact.email ? `EMAIL:${contact.email}\
 ` : ''}
 END:VCARD`;
 
-            // Prepare contact message
             const content = {
                 contacts: {
                     displayName: contact.fullName,
@@ -294,10 +238,8 @@ END:VCARD`;
                 }
             };
 
-            // Send the message
             const result = await session.socket.sendMessage(formattedNumber, content);
 
-            // Update last used timestamp
             session.info.lastUsed = new Date();
 
             return result;
@@ -307,13 +249,6 @@ END:VCARD`;
         }
     }
 
-    /**
-     * Send a button message (template)
-     * @param sessionId The session ID to use
-     * @param to Recipient phone number
-     * @param template Template message configuration
-     * @returns Message send result
-     */
     public async sendTemplateMessage(
         sessionId: string,
         to: string,
@@ -337,17 +272,14 @@ END:VCARD`;
                 throw new Error(`Session is not connected (current status: ${session.info.status})`);
             }
 
-            // Format the phone number
             const formattedNumber = this.formatPhoneNumber(to);
 
-            // Prepare buttons
             const buttons = template.buttons.map(button => ({
                 buttonId: button.id,
                 buttonText: {displayText: button.text},
                 type: 1
             }));
 
-            // Prepare template message
             const content = {
                 text: template.text,
                 footer: template.footer,
@@ -355,10 +287,7 @@ END:VCARD`;
                 headerType: 1
             };
 
-            // Send the message
             const result = await session.socket.sendMessage(formattedNumber, content);
-
-            // Update last used timestamp
             session.info.lastUsed = new Date();
 
             return result;
@@ -368,143 +297,94 @@ END:VCARD`;
         }
     }
 
-    /**
-     * Format phone number to WhatsApp format
-     * @param phoneNumber Phone number to format
-     * @returns Formatted phone number for WhatsApp
-     */
     private formatPhoneNumber(phoneNumber: string): string {
-        // Remove any non-numeric characters
         const cleaned = phoneNumber.replace(/\D/g, '');
-
-        // Ensure it has @s.whatsapp.net suffix
         return cleaned.includes('@') ? cleaned : `${cleaned}@s.whatsapp.net`;
     }
 
-    /**
-     * Check if a phone number exists on WhatsApp
-     * @param sessionId The session ID to use
-     * @param phoneNumber Phone number to check
-     * @returns Boolean indicating if the number exists
-     */
     public async checkPhoneNumberExists(
         sessionId: string,
         phoneNumber: string
     ): Promise<boolean> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.info.status !== SessionStatus.CONNECTED) {
+            throw new Error(`Session is not connected (current status: ${session.info.status})`);
+        }
+
         try {
-            const session = sessionManager.getSession(sessionId);
-
-            if (!session) {
-                throw new Error('Session not found');
-            }
-
-            if (session.info.status !== SessionStatus.CONNECTED) {
-                throw new Error(`Session is not connected (current status: ${session.info.status})`);
-            }
-
-            // Clean the phone number
             const cleaned = phoneNumber.replace(/\D/g, '');
-
-            // Check if the number exists on WhatsApp
             const result = await session.socket.onWhatsApp(cleaned);
-
-            return result?.at(0)?.exists ? true : false;
+            return Boolean(result?.at(0)?.exists);
         } catch (error) {
             logger.error({error, sessionId, phoneNumber}, 'Failed to check phone number');
             throw error;
         }
     }
 
-    /**
-     * Get user profile picture
-     * @param sessionId The session ID to use
-     * @param phoneNumber Phone number to get picture for
-     * @returns URL of the profile picture or null if not available
-     */
     public async getProfilePicture(
         sessionId: string,
         phoneNumber: string
     ): Promise<string | null> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.info.status !== SessionStatus.CONNECTED) {
+            throw new Error(`Session is not connected (current status: ${session.info.status})`);
+        }
+
         try {
-            const session = sessionManager.getSession(sessionId);
-
-            if (!session) {
-                throw new Error('Session not found');
-            }
-
-            if (session.info.status !== SessionStatus.CONNECTED) {
-                throw new Error(`Session is not connected (current status: ${session.info.status})`);
-            }
-
-            // Format the phone number
             const formattedNumber = this.formatPhoneNumber(phoneNumber);
-
-            // Get profile picture URL
             const url = await session.socket.profilePictureUrl(formattedNumber);
-
             return url || null;
         } catch (error) {
-            // If there's no profile picture, this will throw an error
             logger.debug({sessionId, phoneNumber}, 'No profile picture available');
             return null;
         }
     }
 
-    /**
-     * Get user status/about
-     * @param sessionId The session ID to use
-     * @param phoneNumber Phone number to get status for
-     * @returns Status text or null if not available
-     */
     public async getUserStatus(
         sessionId: string,
         phoneNumber: string
     ): Promise<string | null> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.info.status !== SessionStatus.CONNECTED) {
+            throw new Error(`Session is not connected (current status: ${session.info.status})`);
+        }
+
         try {
-            const session = sessionManager.getSession(sessionId);
-
-            if (!session) {
-                throw new Error('Session not found');
-            }
-
-            if (session.info.status !== SessionStatus.CONNECTED) {
-                throw new Error(`Session is not connected (current status: ${session.info.status})`);
-            }
-
-            // Format the phone number
             const formattedNumber = this.formatPhoneNumber(phoneNumber);
-
-            // Get status - the result might be an array or an object with a status property
             const statusResult = await session.socket.fetchStatus(formattedNumber);
-
-            // Fix for TypeScript error: Handle different possible return types
             if (!statusResult) return null;
 
-            // If it's an array, check the first item
             if (Array.isArray(statusResult)) {
-                // If it has a status property, return that
                 if ('status' in statusResult[0]) {
                     return statusResult[0].status as string || null;
                 }
 
-                // If it has a content property, return that
                 if ('content' in statusResult[0]) {
                     return statusResult[0].content as string || null;
                 }
             }
 
-            // Try to stringify if it's an object with unknown structure
             if (typeof statusResult === 'object') {
                 try {
                     return JSON.stringify(statusResult);
                 } catch (e) {
                     return 'Status available but in unsupported format';
                 }
-            }
-
-            // If it's a string, return directly
-            if (typeof statusResult === 'string') {
-                return statusResult;
             }
 
             return null;
@@ -515,5 +395,4 @@ END:VCARD`;
     }
 }
 
-// Export an instance of the service
 export const whatsAppService = new WhatsAppService();

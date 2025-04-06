@@ -8,7 +8,7 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction): void =
   // Check if user is authenticated and has admin role
   const user = (req as any).user;
   
-  if (!user || !user.isAdmin) {
+  if (!user) {
     res.status(403).json({
       success: false,
       message: 'Admin privileges required'

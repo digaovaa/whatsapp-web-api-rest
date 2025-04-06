@@ -1,24 +1,14 @@
-import { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import { sessionManager } from '../core/sessions/SessionManager';
-import { SessionStatus } from '../core/types';
+import {Request, Response} from 'express';
+import {v4 as uuidv4} from 'uuid';
+import {sessionManager} from '../core/sessions/SessionManager';
 import logger from '../utils/logger';
 
-/**
- * Controller for managing WhatsApp sessions
- */
 export class SessionController {
-  /**
-   * Create a new WhatsApp session
-   */
   public async createSession(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.body.userId || 'anonymous';
-      
-      // Generate a unique session ID if not provided
       const sessionId = req.body.sessionId || `session_${uuidv4()}`;
-      
-      // Check if session already exists
+
       if (sessionManager.sessionExists(sessionId)) {
         res.status(409).json({
           success: false,
@@ -28,7 +18,6 @@ export class SessionController {
         return;
       }
       
-      // Start the session
       const sessionInfo = await sessionManager.startSession(userId, sessionId);
       
       res.status(201).json({
@@ -46,14 +35,9 @@ export class SessionController {
     }
   }
 
-  /**
-   * Get session info
-   */
   public getSession(req: Request, res: Response): void {
     try {
       const { sessionId } = req.params;
-      
-      // Get session info
       const sessionInfo = sessionManager.getSessionInfo(sessionId);
       
       if (!sessionInfo) {
@@ -78,14 +62,9 @@ export class SessionController {
     }
   }
 
-  /**
-   * Get QR code for a session
-   */
   public getSessionQR(req: Request, res: Response): void {
     try {
       const { sessionId } = req.params;
-      
-      // Get session QR code
       const qrCode = sessionManager.getSessionQR(sessionId);
       
       if (!qrCode) {
@@ -113,17 +92,10 @@ export class SessionController {
     }
   }
 
-  /**
-   * List all sessions for a user
-   */
   public listUserSessions(req: Request, res: Response): void {
     try {
       const { userId } = req.params;
-      
-      // Get all sessions for the user
       const sessions = sessionManager.getUserSessions(userId);
-      
-      // Map to session info only (exclude socket)
       const sessionInfoList = sessions.map(session => session.info);
       
       res.json({
@@ -140,14 +112,9 @@ export class SessionController {
     }
   }
 
-  /**
-   * Stop and remove a session
-   */
   public async stopSession(req: Request, res: Response): Promise<void> {
     try {
       const { sessionId } = req.params;
-      
-      // Stop the session
       const success = await sessionManager.stopSession(sessionId);
       
       if (!success) {
@@ -172,15 +139,9 @@ export class SessionController {
     }
   }
 
-  /**
-   * List all active sessions (admin only)
-   */
   public listAllSessions(req: Request, res: Response): void {
     try {
-      // Get all sessions
       const sessions = sessionManager.getAllSessions();
-      
-      // Map to session info only (exclude socket)
       const sessionInfoList = sessions.map(session => session.info);
       
       res.json({
@@ -198,5 +159,4 @@ export class SessionController {
   }
 }
 
-// Export controller instance
 export const sessionController = new SessionController();

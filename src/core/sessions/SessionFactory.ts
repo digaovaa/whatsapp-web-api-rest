@@ -13,27 +13,20 @@ import {
 import {useMySQLAuthState} from 'mysql-baileys';
 import {mysqlConfig} from '../../config/database';
 import {EventEmitter} from '../events/EventEmitter';
-import {SessionStatus} from '../types';
+import {SessionInfo, SessionStatus} from '../types';
 import logger from '../../utils/logger';
 import {MessageProcessor} from './MessageProcessor';
 import qrcode from 'qrcode';
 
-/**
- * Factory class for creating WhatsApp sessions
- */
 export class SessionFactory {
-    /**
-     * Create a new WhatsApp session
-     * @param sessionId Unique session identifier
-     * @param onQRCallback Callback for QR code updates
-     * @returns WASocket instance
-     */
+
     public async createSession(
-        sessionId: string,
+        sessionInfo: SessionInfo,
         onQRCallback: (qrCode: string) => void
     ): Promise<WASocket> {
+        const sessionId = sessionInfo.id
+
         try {
-            // Initialize MySQL auth state
             const {state, saveCreds, removeCreds} = await useMySQLAuthState({
                 session: sessionId,
                 host: mysqlConfig.host,
@@ -51,11 +44,12 @@ export class SessionFactory {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, logger),
                 },
-                browser: Browsers.macOS('Chrome'),
+                browser: Browsers.macOS("Desktop"),
                 logger,
                 markOnlineOnConnect: false,
                 generateHighQualityLinkPreview: false,
                 syncFullHistory: false,
+                shouldSyncHistoryMessage: () => false,
                 connectTimeoutMs: 60000,
                 retryRequestDelayMs: 500,
                 transactionOpts: {maxCommitRetries: 10, delayBetweenTriesMs: 1000},
@@ -63,12 +57,7 @@ export class SessionFactory {
                     //TODO: Retrieve messages from some database, the messages has to be saved on "messages.upsert" event
                     return {conversation: 'hello'};
                 },
-                shouldIgnoreJid: (jid) => {
-                    const isGroupJid = isJidGroup(jid);
-                    const isBroadcast = isJidBroadcast(jid);
-                    const isNewsletter = isJidNewsletter(jid);
-                    return isGroupJid || isBroadcast || isNewsletter;
-                }
+                shouldIgnoreJid: (jid) => isJidGroup(jid) || isJidBroadcast(jid) || isJidNewsletter(jid)
             });
 
             this.connectionState.set(sessionId, {
@@ -94,9 +83,7 @@ export class SessionFactory {
                     }
                 }
 
-                // Handle connection state changes
                 if (connection === 'open') {
-                    // Connection established successfully
                     state.pairingStarted = false;
                     state.isReconnecting = false;
 
@@ -109,6 +96,8 @@ export class SessionFactory {
                     if (receivedPendingNotifications) {
                         logger.info({sessionId}, 'Received pending notifications');
                     }
+
+                    sessionInfo.status = SessionStatus.CONNECTED
 
                     EventEmitter.emitSessionUpdate({
                         sessionId,
@@ -124,11 +113,12 @@ export class SessionFactory {
                 }
 
                 if (connection === 'close') {
-                    // Handle connection close
                     const statusCode = (lastDisconnect?.error as any)?.output?.statusCode;
                     const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
 
                     state.lastDisconnect = lastDisconnect;
+
+                    sessionInfo.status = SessionStatus.DISCONNECTED;
 
                     logger.info({
                         sessionId,
@@ -137,11 +127,9 @@ export class SessionFactory {
                         errorMessage: (lastDisconnect?.error as any)?.message
                     }, 'Connection closed');
 
-                    // Handle the stream error (515)
                     if (statusCode === 515) {
                         logger.info({sessionId}, 'Stream error 515 detected, handling reconnection');
 
-                        // Only attempt to reconnect if we're not already trying to reconnect
                         if (!state.isReconnecting) {
                             state.isReconnecting = true;
 
@@ -151,19 +139,14 @@ export class SessionFactory {
                                 data: {message: 'Reconnecting after stream error'}
                             });
 
-                            // Wait before attempting reconnection
                             setTimeout(async () => {
                                 try {
-                                    // We'll create a new socket with the same session
                                     logger.info({sessionId}, 'Attempting to reconnect after stream error');
 
-                                    // Remove existing socket listeners to prevent memory leaks
                                     socket.ev.removeAllListeners('connection.update');
 
-                                    // Create a new socket (we don't remove the session data)
-                                    const newSocket = await this.createSession(sessionId, onQRCallback);
+                                    const newSocket = await this.createSession(sessionInfo, onQRCallback);
 
-                                    // Replace the old socket with the new one
                                     Object.assign(socket, newSocket);
 
                                     state.isReconnecting = false;
@@ -177,28 +160,33 @@ export class SessionFactory {
                                         data: {message: 'Failed to reconnect after stream error'}
                                     });
                                 }
-                            }, 5000); // Wait 5 seconds before reconnecting
+                            }, 5000);
                         }
                     } else if (shouldReconnect) {
-                        // For other reconnectable errors
                         EventEmitter.emitSessionUpdate({
                             sessionId,
                             status: SessionStatus.DISCONNECTED,
                             data: {statusCode}
                         });
                     } else {
-                        // Permanent disconnection (like logged out)
                         void this.removeSession(sessionId);
-                        EventEmitter.emitSessionUpdate({
-                            sessionId,
-                            status: SessionStatus.FAILED,
-                            data: {statusCode, message: 'Logged out or permanent error'}
-                        });
+                        if (statusCode === DisconnectReason.loggedOut) {
+                            EventEmitter.emitSessionUpdate({
+                                sessionId,
+                                status: SessionStatus.STOPPED,
+                                data: {statusCode, message: 'Logged out'}
+                            });
+                        } else {
+                            EventEmitter.emitSessionUpdate({
+                                sessionId,
+                                status: SessionStatus.FAILED,
+                                data: {statusCode, message: 'Permanent error'}
+                            });
+                        }
                     }
                 }
             });
 
-            // Custom listener for pairing success messages
             const originalLogger = socket.logger;
             if (originalLogger) {
                 // Wrap the existing logger to intercept pairing messages
@@ -228,10 +216,8 @@ export class SessionFactory {
                 };
             }
 
-            // Save credentials on update
             socket.ev.on('creds.update', saveCreds);
 
-            // Handle incoming messages
             socket.ev.on('messages.upsert', async ({messages, type}) => {
                 // Only process new messages
                 if (type !== 'notify') return;
@@ -241,20 +227,11 @@ export class SessionFactory {
                     const processedMessage = await MessageProcessor.processMessage(socket, message, sessionId);
 
                     if (processedMessage) {
-                        logger.debug({
-                            sessionId,
-                            messageId: message.key?.id,
-                            from: processedMessage.from,
-                            type: processedMessage.messageType
-                        }, 'Received new message');
-
-                        // Emit the message event
                         EventEmitter.emitMessage(processedMessage);
                     }
                 }
             });
 
-            // Handle message status updates
             socket.ev.on('messages.update', (updates) => {
                 for (const update of updates) {
                     if (update.key && typeof update.update?.status === 'number') {
@@ -283,10 +260,8 @@ export class SessionFactory {
         }
     }
 
-    // Store session removal functions for cleanup
     private removeSessionFunctions = new Map<string, () => Promise<void>>();
 
-    // Track connection state for each session
     private connectionState = new Map<string, {
         isReconnecting: boolean;
         lastDisconnect: any;
@@ -294,10 +269,6 @@ export class SessionFactory {
         pairingStarted: boolean;
     }>();
 
-    /**
-     * Remove a session from storage
-     * @param sessionId Session identifier to remove
-     */
     public async removeSession(sessionId: string): Promise<void> {
         try {
             const removeCreds = this.removeSessionFunctions.get(sessionId);
@@ -306,7 +277,6 @@ export class SessionFactory {
                 this.removeSessionFunctions.delete(sessionId);
             }
 
-            // Remove connection state
             this.connectionState.delete(sessionId);
         } catch (error) {
             logger.error({sessionId, error}, 'Failed to remove session');

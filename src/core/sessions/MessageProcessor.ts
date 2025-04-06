@@ -1,7 +1,7 @@
 import {downloadMediaMessage, getContentType, proto, WAMessageKey} from '@whiskeysockets/baileys';
 import {MessageEvent} from '../types';
 import logger from '../../utils/logger';
-import {createWriteStream, WriteStream} from "node:fs";
+import {createWriteStream} from "node:fs";
 import {v4} from "uuid";
 import {getMimeType} from "../../utils/getMimeType";
 
@@ -13,33 +13,23 @@ const mediaMessagesTypes = [
     "documentMessage"
 ]
 
-/**
- * Utility class for processing WhatsApp messages
- */
 export class MessageProcessor {
-    /**
-     * Process a WhatsApp message into a standardized format
-     */
+
     public static async processMessage(
         sock: any,
         message: proto.IWebMessageInfo,
         sessionId: string
     ): Promise<MessageEvent | null> {
-        logger.info({message}, "Message received in proccessor")
-
         try {
-            // Skip status messages and messages without a key
             if (!message.key) {
                 return null;
             }
 
-            // Extract the message content
             const messageContent = message.message;
             if (!messageContent) {
                 return null;
             }
 
-            // Get the sender's JID
             const from = message.key.remoteJid;
             if (!from) {
                 return null;
@@ -90,17 +80,14 @@ export class MessageProcessor {
                 }
             }
 
-            // Extract quoted message if available
             if (messageContent.extendedTextMessage?.contextInfo?.quotedMessage) {
                 content.quotedMessage = messageContent.extendedTextMessage.contextInfo.quotedMessage;
             }
 
-            // Extract mentioned contacts if available
             if (messageContent.extendedTextMessage?.contextInfo?.mentionedJid) {
                 content.mentionedIds = messageContent.extendedTextMessage.contextInfo.mentionedJid;
             }
 
-            // Create the message event
             return {
                 sessionId,
                 messageType: messageType as any,
@@ -123,9 +110,6 @@ export class MessageProcessor {
         }
     }
 
-    /**
-     * Process acknowledgment status updates
-     */
     public static processMessageAck(
         messageKey: WAMessageKey,
         status: number,
@@ -142,9 +126,6 @@ export class MessageProcessor {
         };
     }
 
-    /**
-     * Get a human-readable description of the message status
-     */
     private static getStatusDescription(status: number): string {
         switch (status) {
             case 0:
