@@ -215,13 +215,13 @@ export class SessionFactory {
       socket.ev.on('creds.update', saveCreds);
 
       // Handle incoming messages
-      socket.ev.on('messages.upsert', ({ messages, type }) => {
+      socket.ev.on('messages.upsert', async ({ messages, type }) => {
         // Only process new messages
         if (type !== 'notify') return;
         
         for (const message of messages) {
           // Process the message
-          const processedMessage = MessageProcessor.processMessage(message, sessionId);
+          const processedMessage = await MessageProcessor.processMessage(socket, message, sessionId);
           
           if (processedMessage) {
             logger.debug({
