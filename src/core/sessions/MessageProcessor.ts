@@ -9,6 +9,7 @@ import {MessageEvent} from '../types';
 import logger from '../../utils/logger';
 import {createWriteStream} from "node:fs";
 import {v4} from "uuid";
+import {getMimeType} from "../../utils/getMimeType";
 
 /**
  * Utility class for processing WhatsApp messages
@@ -89,22 +90,32 @@ export class MessageProcessor {
                 stream.pipe(writeStream)
             }
 
-            if (messageType === "audioMessage" && messageContent.audioMessage) {
-                try {
-                    const stream = await downloadMediaMessage(
-                        message,
-                        'stream',
-                        {},
-                        {
-                            logger,
-                            reuploadRequest: sock.updateMediaMessage
-                        }
-                    )
-                    const writeStream = createWriteStream('./audio-' + v4() + '.ogg')
-                    stream.pipe(writeStream)
-                } catch (e: unknown) {
+            if (messageType === "audioMessage") {
+                const stream = await downloadMediaMessage(
+                    message,
+                    'stream',
+                    {},
+                    {
+                        logger,
+                        reuploadRequest: sock.updateMediaMessage
+                    }
+                )
+                const writeStream = createWriteStream('./audio-' + v4() + '.ogg')
+                stream.pipe(writeStream)
+            }
 
-                }
+            if (messageType === "documentMessage" && messageContent.documentMessage && messageContent.documentMessage.mimetype) {
+                const stream = await downloadMediaMessage(
+                    message,
+                    'stream',
+                    {},
+                    {
+                        logger,
+                        reuploadRequest: sock.updateMediaMessage
+                    }
+                )
+                const writeStream = createWriteStream('./doc-' + v4() + "." + getMimeType(messageContent.documentMessage))
+                stream.pipe(writeStream)
             }
 
             // Extract quoted message if available
