@@ -127,3 +127,13 @@ npm run dev
 ## License
 
 MIT
+
+
+# CURRENT PROGRESS
+
+- Webhook to receive text messages
+- Endpoint to send text messages
+- Endpoint to send media messages
+- Session restoration
+- QR endpoint
+
