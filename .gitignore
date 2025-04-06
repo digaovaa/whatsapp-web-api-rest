@@ -26,3 +26,6 @@ storage/sessions/*
 # OS
 .DS_Store
 Thumbs.db
+
+.idea/
+.vscode/
