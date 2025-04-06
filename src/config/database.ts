@@ -12,3 +12,5 @@ const mysqlEnvSchema = z.object({
 })
 
 export const mysqlConfig = mysqlEnvSchema.parse(process.env);
+
+export const webhookUrl = process.env.WEBHOOK_URL || "http://localhost:3001/api/webhook/message";

@@ -1,7 +1,8 @@
-import {mysqlConfig} from '../../config/database';
+import {mysqlConfig, webhookUrl} from '../../config/database';
 import {sessionManager} from './SessionManager';
 import logger from '../../utils/logger';
 import mysql from 'mysql2/promise';
+import {webhookService} from "../../services/WebhookService";
 
 export type Session = {
     sessionId: string;
@@ -32,6 +33,7 @@ export class SessionRestoreService {
                     const {sessionId, userId} = session;
                     logger.info({sessionId, userId}, 'Restoring session');
                     await sessionManager.startSession(userId, sessionId);
+                    webhookService.registerWebhook(sessionId, webhookUrl);
                 } catch (error) {
                     logger.error({error, sessionId: session.sessionId}, 'Failed to restore session');
                 }

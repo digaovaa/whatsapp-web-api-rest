@@ -1,4 +1,10 @@
-import {downloadMediaMessage, getContentType, proto, WAMessageKey} from '@whiskeysockets/baileys';
+import {
+    downloadContentFromMessage,
+    downloadMediaMessage,
+    getContentType,
+    proto,
+    WAMessageKey
+} from '@whiskeysockets/baileys';
 import {MessageEvent} from '../types';
 import logger from '../../utils/logger';
 import {createWriteStream} from "node:fs";
@@ -83,6 +89,23 @@ export class MessageProcessor {
                 stream.pipe(writeStream)
             }
 
+            if (messageType === "audioMessage" && messageContent.audioMessage) {
+                try {
+                    const stream = await downloadMediaMessage(
+                        message,
+                        'stream',
+                        {},
+                        {
+                            logger,
+                            reuploadRequest: sock.updateMediaMessage
+                        }
+                    )
+                    const writeStream = createWriteStream('./audio-' + v4() + '.ogg')
+                    stream.pipe(writeStream)
+                } catch (e: unknown) {
+
+                }
+            }
 
             // Extract quoted message if available
             if (messageContent.extendedTextMessage?.contextInfo?.quotedMessage) {
