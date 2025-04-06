@@ -146,19 +146,22 @@ export class WhatsAppService {
         const fallbackMimeTypes: Record<string, string> = {
             'image': 'image/jpeg',
             'video': 'video/mp4',
-            'document': 'application/pdf',
+            'document': 'application/octet-stream',
             'audio': 'audio/mpeg',
             'sticker': 'image/webp'
         };
 
         try {
-            const urlObj = new URL(url);
-            const pathname = urlObj.pathname;
-            const extension = pathname.split('.').pop()?.toLowerCase();
+            if (type === "document") {
+                const urlObj = new URL(url);
+                const pathname = urlObj.pathname;
+                const extension = pathname.split('.').pop()?.toLowerCase();
 
-            if (extension) {
-                const mimeType = mime.lookup(extension);
-                if (mimeType) return mimeType;
+                if (extension) {
+                    const mimeType = mime.lookup(extension);
+                    logger.info({pathname, extension, mimeType}, "Searching mimetype")
+                    if (mimeType) return mimeType;
+                }
             }
 
             return fallbackMimeTypes[type] || 'application/octet-stream';

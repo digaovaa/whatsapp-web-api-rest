@@ -20,5 +20,5 @@ export function getMimeType(doc: proto.Message.IDocumentMessage): string {
         return conversions[doc.mimetype] ?? doc.mimetype.split('/')[1];
     }
 
-    return "application/octet-stream"
+    return ""
 }
