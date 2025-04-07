@@ -4,6 +4,7 @@ import logger from '../../utils/logger';
 import {createWriteStream} from "node:fs";
 import {v4} from "uuid";
 import {getMimeType} from "../../utils/getMimeType";
+import {pipeline} from "node:stream/promises";
 
 const mediaMessagesTypes = [
     "audioMessage",
@@ -62,21 +63,26 @@ export class MessageProcessor {
                 }
 
                 if (mimeType.length) {
-                    const filepath = './' + v4() + "." + mimeType;
+                    try {
+                        const filepath = './' + v4() + "." + mimeType;
 
-                    const stream = await downloadMediaMessage(
-                        message,
-                        'stream',
-                        {},
-                        {
-                            logger,
-                            reuploadRequest: sock.updateMediaMessage
-                        }
-                    )
+                        const stream = await downloadMediaMessage(
+                            message,
+                            'stream',
+                            {},
+                            {
+                                logger,
+                                reuploadRequest: sock.updateMediaMessage
+                            }
+                        )
 
-                    stream.pipe(createWriteStream(filepath))
-                    // TODO: Upload the image to bucket and return the public link
-                    content.filename = filepath
+                        await pipeline(stream, createWriteStream(filepath));
+
+                        // TODO: Upload the image to bucket and return the public link
+                        content.filename = filepath
+                    } catch (e) {
+                        logger.error(e)
+                    }
                 }
             }
 

@@ -219,11 +219,9 @@ export class SessionFactory {
             socket.ev.on('creds.update', saveCreds);
 
             socket.ev.on('messages.upsert', async ({messages, type}) => {
-                // Only process new messages
                 if (type !== 'notify') return;
 
                 for (const message of messages) {
-                    // Process the message
                     const processedMessage = await MessageProcessor.processMessage(socket, message, sessionId);
 
                     if (processedMessage) {

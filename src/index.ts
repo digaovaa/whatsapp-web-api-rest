@@ -22,3 +22,12 @@ const startServer = async () => {
 };
 
 void startServer();
+
+process.on('uncaughtException', (error) => {
+    logger.error({ error }, 'Uncaught exception');
+    // Optionally, gracefully shut down or restart
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error({ reason, promise }, 'Unhandled promise rejection');
+});
