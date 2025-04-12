@@ -5,6 +5,46 @@ import logger from '../utils/logger';
 
 export class MessageController {
 
+
+    public async downloadProfilePhoto(req: Request, res: Response): Promise<void> {
+        try {
+            const {sessionId} = req.params;
+            const {to} = req.body;
+
+            if (!to) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Missing required fields: to'
+                });
+                return;
+            }
+
+            const session = sessionManager.getSessionInfo(sessionId);
+            if (!session) {
+                res.status(404).json({
+                    success: false,
+                    message: 'Session not found'
+                });
+                return;
+            }
+
+            const result = await whatsAppService.downloadProfile(sessionId,to);
+
+            res.json({
+                success: true,
+                message: 'Profile downloaded successfully',
+                data: result
+            });
+        } catch (error) {
+            logger.error({error, sessionId: req.params.sessionId}, 'Failed to download profile photo');
+            res.status(500).json({
+                success: false,
+                message: 'Failed to download profile photo',
+                error: (error as Error).message
+            });
+        }
+    }
+
     public async sendText(req: Request, res: Response): Promise<void> {
         try {
             const {sessionId} = req.params;

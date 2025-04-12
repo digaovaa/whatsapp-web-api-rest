@@ -6,6 +6,21 @@ import {AnyMediaMessageContent, proto, WAMediaUpload} from "@whiskeysockets/bail
 
 export class WhatsAppService {
 
+    public async downloadProfile(sessionId: string, of: string) {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        const result = await session.socket.onWhatsApp(of);
+
+        if (result && result.at(0)) {
+            const ppUrl = await session.socket.profilePictureUrl(result.at(0)!.jid, 'image');
+            return ppUrl;
+        }
+    }
+
     public async sendTextMessage(
         sessionId: string,
         to: string,
@@ -50,7 +65,7 @@ export class WhatsAppService {
         }
 
         try {
-            const formattedNumber = this.formatPhoneNumber(to);
+            const formattedNumber = to.includes("@") ? to : this.formatPhoneNumber(to);
             const mimeType = this.getMimeTypeFromUrl(media.url, media.type);
             const filename = media.filename || this.getFilenameFromUrl(media.url);
 

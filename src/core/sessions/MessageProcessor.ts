@@ -1,10 +1,12 @@
-import {downloadMediaMessage, getContentType, proto, WAMessageKey} from '@whiskeysockets/baileys';
-import {MessageEvent} from '../types';
+import { downloadMediaMessage, getContentType, proto, WAMessageKey } from '@whiskeysockets/baileys';
+import { MessageEvent, SessionInfo } from '../types';
 import logger from '../../utils/logger';
-import {createWriteStream} from "node:fs";
-import {v4} from "uuid";
-import {getMimeType} from "../../utils/getMimeType";
-import {pipeline} from "node:stream/promises";
+import { createWriteStream } from "node:fs";
+import { v4 } from "uuid";
+import { getMimeType } from "../../utils/getMimeType";
+import { pipeline } from "node:stream/promises";
+import { storage } from '../repositories/Storage';
+import * as fs from 'fs';
 
 const mediaMessagesTypes = [
     "audioMessage",
@@ -19,7 +21,7 @@ export class MessageProcessor {
     public static async processMessage(
         sock: any,
         message: proto.IWebMessageInfo,
-        sessionId: string
+        sessionInfo: SessionInfo
     ): Promise<MessageEvent | null> {
         try {
             if (!message.key) {
@@ -64,22 +66,19 @@ export class MessageProcessor {
 
                 if (mimeType.length) {
                     try {
-                        const filepath = './' + v4() + "." + mimeType;
+                        const fileName = v4() + "." + mimeType;
+                        const filepath = './' + fileName;
 
-                        const stream = await downloadMediaMessage(
-                            message,
-                            'stream',
-                            {},
-                            {
-                                logger,
-                                reuploadRequest: sock.updateMediaMessage
-                            }
-                        )
+                        const stream = await downloadMediaMessage(message, 'stream', {}, {
+                            logger,
+                            reuploadRequest: sock.updateMediaMessage
+                        })
 
                         await pipeline(stream, createWriteStream(filepath));
-
-                        // TODO: Upload the image to bucket and return the public link
-                        content.filename = filepath
+                        const url = await storage.uploadFile(filepath, sessionInfo.id + "/uploads/" + fileName);
+                        fs.unlinkSync(filepath);
+                        content.fileError = url.error;
+                        content.filename = url.publicUrl;
                     } catch (e) {
                         logger.error(e)
                     }
@@ -95,7 +94,8 @@ export class MessageProcessor {
             }
 
             return {
-                sessionId,
+                sessionId: sessionInfo.id,
+                userId: sessionInfo.userId,
                 messageType: messageType as any,
                 message,
                 timestamp: message.messageTimestamp
@@ -109,7 +109,7 @@ export class MessageProcessor {
         } catch (error) {
             logger.error({
                 error,
-                sessionId,
+                sessionId: sessionInfo.id,
                 messageId: message.key?.id
             }, 'Failed to process message');
             return null;
@@ -119,10 +119,11 @@ export class MessageProcessor {
     public static processMessageAck(
         messageKey: WAMessageKey,
         status: number,
-        sessionId: string
+        sessionInfo: SessionInfo
     ): any {
         return {
-            sessionId,
+            sessionId: sessionInfo.id,
+            userId: sessionInfo.userId,
             messageId: messageKey.id,
             remoteJid: messageKey.remoteJid,
             fromMe: messageKey.fromMe,

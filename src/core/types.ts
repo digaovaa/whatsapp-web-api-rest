@@ -38,6 +38,7 @@ export interface SessionEvent {
 
 export interface MessageEvent {
   sessionId: string;
+  userId: string;
   messageType: 'text' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'sticker' | 'unknown';
   message: proto.IWebMessageInfo;
   timestamp: number;

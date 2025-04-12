@@ -1,7 +1,8 @@
-import {mysqlConfig} from '../../config/database';
-import {sessionManager} from './SessionManager';
+import { mysqlConfig } from '../../config/database';
+import { sessionManager } from './SessionManager';
 import logger from '../../utils/logger';
-import mysql from 'mysql2/promise';
+import mysql, { RowDataPacket } from 'mysql2/promise';
+import { userRepository } from '../repositories/UserRepository';
 
 export type Session = {
     sessionId: string;
@@ -25,19 +26,19 @@ export class SessionRestoreService {
     public async restoreAllSessions(): Promise<void> {
         try {
             const sessions = await this.getStoredSessionIds();
-            logger.info({count: sessions.length}, 'Found stored sessions');
+            logger.info({ count: sessions.length }, 'Found stored sessions');
 
             for (const session of sessions) {
                 try {
-                    const {sessionId, userId} = session;
-                    logger.info({sessionId, userId}, 'Restoring session');
+                    const { sessionId, userId } = session;
+                    logger.info({ sessionId, userId }, 'Restoring session');
                     await sessionManager.startSession(userId, sessionId);
                 } catch (error) {
-                    logger.error({error, sessionId: session.sessionId}, 'Failed to restore session');
+                    logger.error({ error, sessionId: session.sessionId }, 'Failed to restore session');
                 }
             }
         } catch (error) {
-            logger.error({error}, 'Failed to restore sessions');
+            logger.error({ error }, 'Failed to restore sessions');
         }
     }
 
@@ -51,19 +52,37 @@ export class SessionRestoreService {
                 database: mysqlConfig.database
             });
 
-            const [rows] = await connection.execute(
+            const [rows] = await connection.execute<RowDataPacket[]>(
                 `SELECT DISTINCT session as sessionId
                  FROM ${mysqlConfig.tableName}`
             );
 
             await connection.end();
 
-            return (rows as any[]).map(row => ({
-                sessionId: row.sessionId,
-                userId: 'restored-user'
-            }));
+            const result: Session[] = []
+
+            if (rows.length === 0) {
+                logger.info('No stored sessions found');
+                return result;
+            }
+
+            for (const row of rows) {
+                const userId = await userRepository.findBySessionId(row.sessionId);
+
+                if (!userId) {
+                    logger.warn({ sessionId: row.sessionId }, 'No user found for session');
+                    continue;
+                }
+
+                result.push({
+                    sessionId: row.sessionId,
+                    userId: userId.userId,
+                });
+            }
+
+            return result;
         } catch (error) {
-            logger.error({error}, 'Failed to query stored sessions');
+            logger.error({ error }, 'Failed to query stored sessions');
             return [];
         }
     }

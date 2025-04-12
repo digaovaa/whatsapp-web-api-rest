@@ -1,4 +1,5 @@
 import {z} from "zod";
+import "dotenv/config"
 
 const mysqlEnvSchema = z.object({
     host: z.string().default("localhost"),
@@ -7,6 +8,7 @@ const mysqlEnvSchema = z.object({
     password: z.string().default("$Carlos1030"),
     database: z.string().default("baileys"),
     tableName: z.string().default("auth"),
+    userTableName: z.string().default("users"),
     ssl: z.coerce.boolean().default(false),
     allowPublicKeyRetrieval: z.coerce.boolean().default(false),
 })

@@ -35,10 +35,7 @@ export class WebhookService {
                 data
             };
 
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json',
-                'User-Agent': 'WhatsApp-API-Webhook'
-            };
+            const headers: Record<string, string> = {'Content-Type': 'application/json'};
 
             const response = await axios.post(
                 webhookUrl,

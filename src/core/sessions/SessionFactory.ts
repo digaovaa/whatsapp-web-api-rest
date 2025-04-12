@@ -10,13 +10,14 @@ import {
     WAMessageKey,
     WASocket
 } from '@whiskeysockets/baileys';
-import {useMySQLAuthState} from 'mysql-baileys';
-import {mysqlConfig} from '../../config/database';
-import {EventEmitter} from '../events/EventEmitter';
-import {SessionInfo, SessionStatus} from '../types';
-import logger from '../../utils/logger';
-import {MessageProcessor} from './MessageProcessor';
+import { useMySQLAuthState } from 'mysql-baileys';
 import qrcode from 'qrcode';
+import { mysqlConfig } from '../../config/database';
+import logger from '../../utils/logger';
+import { EventEmitter } from '../events/EventEmitter';
+import { userRepository } from '../repositories/UserRepository';
+import { SessionInfo, SessionStatus } from '../types';
+import { MessageProcessor } from './MessageProcessor';
 
 export class SessionFactory {
 
@@ -27,7 +28,7 @@ export class SessionFactory {
         const sessionId = sessionInfo.id
 
         try {
-            const {state, saveCreds, removeCreds} = await useMySQLAuthState({
+            const { state, saveCreds, removeCreds } = await useMySQLAuthState({
                 session: sessionId,
                 host: mysqlConfig.host,
                 port: mysqlConfig.port,
@@ -44,7 +45,7 @@ export class SessionFactory {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, logger),
                 },
-                browser: Browsers.macOS("Desktop"),
+                browser: Browsers.macOS("Chrome"),
                 logger,
                 markOnlineOnConnect: false,
                 generateHighQualityLinkPreview: false,
@@ -52,10 +53,10 @@ export class SessionFactory {
                 shouldSyncHistoryMessage: () => false,
                 connectTimeoutMs: 60000,
                 retryRequestDelayMs: 500,
-                transactionOpts: {maxCommitRetries: 10, delayBetweenTriesMs: 1000},
+                transactionOpts: { maxCommitRetries: 10, delayBetweenTriesMs: 1000 },
                 getMessage: async (msg: WAMessageKey): Promise<WAMessageContent | undefined> => {
                     //TODO: Retrieve messages from some database, the messages has to be saved on "messages.upsert" event
-                    return {conversation: 'hello'};
+                    return { conversation: 'hello' };
                 },
                 shouldIgnoreJid: (jid) => isJidGroup(jid) || isJidBroadcast(jid) || isJidNewsletter(jid)
             });
@@ -68,7 +69,7 @@ export class SessionFactory {
             });
 
             socket.ev.on('connection.update', async (update) => {
-                const {connection, lastDisconnect, qr, isNewLogin, receivedPendingNotifications} = update;
+                const { connection, lastDisconnect, qr, isNewLogin, receivedPendingNotifications } = update;
                 const state = this.connectionState.get(sessionId);
 
                 if (!state) return;
@@ -79,7 +80,7 @@ export class SessionFactory {
                         const qrCode = await qrcode.toDataURL(qr);
                         onQRCallback(qrCode);
                     } catch (error) {
-                        logger.error({sessionId, error}, 'Failed to generate QR code');
+                        logger.error({ sessionId, error }, 'Failed to generate QR code');
                     }
                 }
 
@@ -87,14 +88,14 @@ export class SessionFactory {
                     state.pairingStarted = false;
                     state.isReconnecting = false;
 
-                    logger.info({sessionId}, 'Connection established successfully');
+                    logger.info({ sessionId }, 'Connection established successfully');
 
                     if (isNewLogin) {
-                        logger.info({sessionId}, 'New login detected');
+                        logger.info({ sessionId }, 'New login detected');
                     }
 
                     if (receivedPendingNotifications) {
-                        logger.info({sessionId}, 'Received pending notifications');
+                        logger.info({ sessionId }, 'Received pending notifications');
                     }
 
                     sessionInfo.status = SessionStatus.CONNECTED
@@ -128,7 +129,7 @@ export class SessionFactory {
                     }, 'Connection closed');
 
                     if (statusCode === 515) {
-                        logger.info({sessionId}, 'Stream error 515 detected, handling reconnection');
+                        logger.info({ sessionId }, 'Stream error 515 detected, handling reconnection');
 
                         if (!state.isReconnecting) {
                             state.isReconnecting = true;
@@ -136,12 +137,12 @@ export class SessionFactory {
                             EventEmitter.emitSessionUpdate({
                                 sessionId,
                                 status: SessionStatus.CONNECTING,
-                                data: {message: 'Reconnecting after stream error'}
+                                data: { message: 'Reconnecting after stream error' }
                             });
 
                             setTimeout(async () => {
                                 try {
-                                    logger.info({sessionId}, 'Attempting to reconnect after stream error');
+                                    logger.info({ sessionId }, 'Attempting to reconnect after stream error');
 
                                     socket.ev.removeAllListeners('connection.update');
 
@@ -151,13 +152,13 @@ export class SessionFactory {
 
                                     state.isReconnecting = false;
                                 } catch (err) {
-                                    logger.error({sessionId, err}, 'Failed to reconnect after stream error');
+                                    logger.error({ sessionId, err }, 'Failed to reconnect after stream error');
                                     state.isReconnecting = false;
 
                                     EventEmitter.emitSessionUpdate({
                                         sessionId,
                                         status: SessionStatus.FAILED,
-                                        data: {message: 'Failed to reconnect after stream error'}
+                                        data: { message: 'Failed to reconnect after stream error' }
                                     });
                                 }
                             }, 5000);
@@ -166,7 +167,7 @@ export class SessionFactory {
                         EventEmitter.emitSessionUpdate({
                             sessionId,
                             status: SessionStatus.DISCONNECTED,
-                            data: {statusCode}
+                            data: { statusCode }
                         });
                     } else {
                         void this.removeSession(sessionId);
@@ -174,13 +175,13 @@ export class SessionFactory {
                             EventEmitter.emitSessionUpdate({
                                 sessionId,
                                 status: SessionStatus.STOPPED,
-                                data: {statusCode, message: 'Logged out'}
+                                data: { statusCode, message: 'Logged out' }
                             });
                         } else {
                             EventEmitter.emitSessionUpdate({
                                 sessionId,
                                 status: SessionStatus.FAILED,
-                                data: {statusCode, message: 'Permanent error'}
+                                data: { statusCode, message: 'Permanent error' }
                             });
                         }
                     }
@@ -197,7 +198,7 @@ export class SessionFactory {
 
                         // Intercept the pairing message
                         if (message && message.includes('pairing configured successfully')) {
-                            logger.info({sessionId}, 'Pairing successful, preparing for connection restart');
+                            logger.info({ sessionId }, 'Pairing successful, preparing for connection restart');
 
                             if (state) {
                                 state.pairingStarted = true;
@@ -206,7 +207,7 @@ export class SessionFactory {
                             EventEmitter.emitSessionUpdate({
                                 sessionId,
                                 status: SessionStatus.CONNECTING,
-                                data: {message: 'Pairing successful, connection restarting'}
+                                data: { message: 'Pairing successful, connection restarting' }
                             });
                         }
 
@@ -216,16 +217,19 @@ export class SessionFactory {
                 };
             }
 
-            socket.ev.on('creds.update', saveCreds);
+            socket.ev.on('creds.update', async () => {
+                await userRepository.add(sessionInfo.userId, sessionId);
+                saveCreds();
+            });
 
-            socket.ev.on('messages.upsert', async ({messages, type}) => {
+            socket.ev.on('messages.upsert', async ({ messages, type }) => {
                 if (type !== 'notify') return;
 
                 for (const message of messages) {
-                    const processedMessage = await MessageProcessor.processMessage(socket, message, sessionId);
+                    const processedMessage = await MessageProcessor.processMessage(socket, message, sessionInfo);
 
                     if (processedMessage) {
-                        EventEmitter.emitMessage(processedMessage);
+                        EventEmitter.emitMessage({ ...processedMessage, userId: sessionInfo.userId });
                     }
                 }
             });
@@ -236,24 +240,23 @@ export class SessionFactory {
                         const ack = MessageProcessor.processMessageAck(
                             update.key,
                             update.update.status,
-                            sessionId
+                            sessionInfo
                         );
 
                         logger.debug({
-                            sessionId,
+                            sessionId: sessionInfo.id,
                             messageId: update.key.id,
                             status: ack.statusDescription
                         }, 'Message status update');
 
-                        // Emit the message ack event
-                        EventEmitter.emitMessageAck(ack);
+                        EventEmitter.emitMessageAck({ ...ack, userId: sessionInfo.userId });
                     }
                 }
             });
 
             return socket;
         } catch (error) {
-            logger.error({sessionId, error}, 'Failed to create session');
+            logger.error({ sessionId, error }, 'Failed to create session');
             throw error;
         }
     }
@@ -277,7 +280,7 @@ export class SessionFactory {
 
             this.connectionState.delete(sessionId);
         } catch (error) {
-            logger.error({sessionId, error}, 'Failed to remove session');
+            logger.error({ sessionId, error }, 'Failed to remove session');
             throw error;
         }
     }

@@ -10,6 +10,14 @@ router.post(
   messageController.sendText.bind(messageController)
 );
 
+
+router.get(
+    '/sessions/:sessionId/download-profile-photo',
+    isAuthenticated,
+    messageController.downloadProfilePhoto.bind(messageController)
+);
+
+
 router.post(
   '/sessions/:sessionId/messages/media',
   isAuthenticated,
