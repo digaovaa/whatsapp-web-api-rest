@@ -2,7 +2,7 @@ import {EventEmitter} from '../core/events/EventEmitter';
 import {MessageEvent, QRCodeEvent, SessionEvent, WebhookEventType} from '../core/types';
 import axios from 'axios';
 import logger from '../utils/logger';
-import {webhookUrl} from "../config/database";
+import {webhookUrl} from "../config/env";
 
 export class WebhookService {
     private static instance: WebhookService;

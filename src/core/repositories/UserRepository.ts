@@ -1,4 +1,4 @@
-import { mysqlConfig } from "../../config/database";
+import { mysqlConfig } from "../../config/env";
 import mysql, { RowDataPacket } from 'mysql2/promise';
 import logger from "../../utils/logger";
 
@@ -12,16 +12,16 @@ class UserRepository {
     async add(userId: string, sessionId: string): Promise<void> {
         try {
             const connection = await mysql.createConnection({
-                host: mysqlConfig.host,
-                port: mysqlConfig.port,
-                user: mysqlConfig.user,
-                password: mysqlConfig.password,
-                database: mysqlConfig.database
+                host: mysqlConfig.MYSQL_HOST,
+                port: mysqlConfig.MYSQL_PORT,
+                user: mysqlConfig.MYSQL_USER,
+                password: mysqlConfig.MYSQL_PASSWORD,
+                database: mysqlConfig.MYSQL_DATABASE
             });
 
 
             await connection.execute(
-                `INSERT INTO ${mysqlConfig.userTableName} (sessionId, userId) VALUES (?, ?)`,
+                `INSERT INTO users (sessionId, userId) VALUES (?, ?)`,
                 [sessionId, userId]
             );
 
@@ -34,16 +34,16 @@ class UserRepository {
     async findBySessionId(sessionId: string): Promise<UserRow | null> {
         try {
             const connection = await mysql.createConnection({
-                host: mysqlConfig.host,
-                port: mysqlConfig.port,
-                user: mysqlConfig.user,
-                password: mysqlConfig.password,
-                database: mysqlConfig.database
+                host: mysqlConfig.MYSQL_HOST,
+                port: mysqlConfig.MYSQL_PORT,
+                user: mysqlConfig.MYSQL_USER,
+                password: mysqlConfig.MYSQL_PASSWORD,
+                database: mysqlConfig.MYSQL_DATABASE
             });
 
 
             const [rows] = await connection.execute<UserRow[]>(
-                `SELECT * FROM ${mysqlConfig.userTableName} WHERE sessionId = ? LIMIT 1`,
+                `SELECT * FROM users WHERE sessionId = ? LIMIT 1`,
                 [sessionId]
             );
 

@@ -12,7 +12,7 @@ import {
 } from '@whiskeysockets/baileys';
 import { useMySQLAuthState } from 'mysql-baileys';
 import qrcode from 'qrcode';
-import { mysqlConfig } from '../../config/database';
+import { mysqlConfig } from '../../config/env';
 import logger from '../../utils/logger';
 import { EventEmitter } from '../events/EventEmitter';
 import { userRepository } from '../repositories/UserRepository';
@@ -30,12 +30,12 @@ export class SessionFactory {
         try {
             const { state, saveCreds, removeCreds } = await useMySQLAuthState({
                 session: sessionId,
-                host: mysqlConfig.host,
-                port: mysqlConfig.port,
-                user: mysqlConfig.user,
-                password: mysqlConfig.password,
-                database: mysqlConfig.database,
-                tableName: mysqlConfig.tableName
+                host: mysqlConfig.MYSQL_HOST,
+                port: mysqlConfig.MYSQL_PORT,
+                user: mysqlConfig.MYSQL_USER,
+                password: mysqlConfig.MYSQL_PASSWORD,
+                database: mysqlConfig.MYSQL_DATABASE,
+                tableName: "auth"
             });
 
             this.removeSessionFunctions.set(sessionId, removeCreds);

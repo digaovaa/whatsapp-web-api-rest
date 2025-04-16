@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import routes from './routes';
 import logger from './utils/logger';
+import { NODE_ENV } from './config/env';
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).json({
     success: false,
     message: 'Internal server error',
-    error: process.env.NODE_ENV === 'production' ? undefined : err.message
+    error: NODE_ENV === 'production' ? undefined : err.message
   });
 });
 

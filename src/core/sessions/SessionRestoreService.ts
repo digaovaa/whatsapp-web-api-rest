@@ -1,4 +1,4 @@
-import { mysqlConfig } from '../../config/database';
+import { mysqlConfig } from '../../config/env';
 import { sessionManager } from './SessionManager';
 import logger from '../../utils/logger';
 import mysql, { RowDataPacket } from 'mysql2/promise';
@@ -45,17 +45,14 @@ export class SessionRestoreService {
     private async getStoredSessionIds(): Promise<Session[]> {
         try {
             const connection = await mysql.createConnection({
-                host: mysqlConfig.host,
-                port: mysqlConfig.port,
-                user: mysqlConfig.user,
-                password: mysqlConfig.password,
-                database: mysqlConfig.database
+                host: mysqlConfig.MYSQL_HOST,
+                port: mysqlConfig.MYSQL_PORT,
+                user: mysqlConfig.MYSQL_USER,
+                password: mysqlConfig.MYSQL_PASSWORD,
+                database: mysqlConfig.MYSQL_DATABASE
             });
 
-            const [rows] = await connection.execute<RowDataPacket[]>(
-                `SELECT DISTINCT session as sessionId
-                 FROM ${mysqlConfig.tableName}`
-            );
+            const [rows] = await connection.execute<RowDataPacket[]>('SELECT DISTINCT session as sessionId FROM auth');
 
             await connection.end();
 
