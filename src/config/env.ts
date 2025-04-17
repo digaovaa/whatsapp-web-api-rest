@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { config } from "dotenv"
-import logger from "../utils/logger";
 
 config()
 
@@ -15,7 +14,6 @@ const mysqlEnvSchema = z.object({
 export const mysqlConfig = mysqlEnvSchema.parse(process.env);
 
 export const webhookUrl = process.env.WEBHOOK_URL || "http://localhost:3001/api/webhook/message";
-
 export const logLevel = process.env.LOG_LEVEL || "info";
 export const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 export const NODE_ENV = process.env.NODE_ENV || "development";

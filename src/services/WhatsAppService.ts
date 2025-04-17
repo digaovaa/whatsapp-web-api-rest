@@ -16,8 +16,7 @@ export class WhatsAppService {
         const result = await session.socket.onWhatsApp(of);
 
         if (result && result.at(0)) {
-            const ppUrl = await session.socket.profilePictureUrl(result.at(0)!.jid, 'image');
-            return ppUrl;
+            return await session.socket.profilePictureUrl(result.at(0)!.jid, 'image');
         }
     }
 
@@ -26,13 +25,13 @@ export class WhatsAppService {
         to: string,
         text: string
     ): Promise<any> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
         try {
-            const session = sessionManager.getSession(sessionId);
-
-            if (!session) {
-                throw new Error('Session not found');
-            }
-
             const formattedNumber = this.formatPhoneNumber(to);
 
             const result = await session.socket.sendMessage(formattedNumber, {
@@ -181,17 +180,17 @@ export class WhatsAppService {
         name?: string,
         address?: string
     ): Promise<any> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.info.status !== SessionStatus.CONNECTED) {
+            throw new Error(`Session is not connected (current status: ${session.info.status})`);
+        }
+
         try {
-            const session = sessionManager.getSession(sessionId);
-
-            if (!session) {
-                throw new Error('Session not found');
-            }
-
-            if (session.info.status !== SessionStatus.CONNECTED) {
-                throw new Error(`Session is not connected (current status: ${session.info.status})`);
-            }
-
             const formattedNumber = this.formatPhoneNumber(to);
 
             const content = {
@@ -276,17 +275,17 @@ END:VCARD`;
             }>
         }
     ): Promise<any> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.info.status !== SessionStatus.CONNECTED) {
+            throw new Error(`Session is not connected (current status: ${session.info.status})`);
+        }
+
         try {
-            const session = sessionManager.getSession(sessionId);
-
-            if (!session) {
-                throw new Error('Session not found');
-            }
-
-            if (session.info.status !== SessionStatus.CONNECTED) {
-                throw new Error(`Session is not connected (current status: ${session.info.status})`);
-            }
-
             const formattedNumber = this.formatPhoneNumber(to);
 
             const buttons = template.buttons.map(button => ({

@@ -85,5 +85,4 @@ export class SessionRestoreService {
     }
 }
 
-// Export singleton instance
 export const sessionRestoreService = SessionRestoreService.getInstance();

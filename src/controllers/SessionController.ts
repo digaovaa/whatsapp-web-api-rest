@@ -139,7 +139,7 @@ export class SessionController {
     }
   }
 
-  public listAllSessions(req: Request, res: Response): void {
+  public listAllSessions(_req: Request, res: Response): void {
     try {
       const sessions = sessionManager.getAllSessions();
       const sessionInfoList = sessions.map(session => session.info);
