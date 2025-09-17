@@ -1,4 +1,4 @@
-import type { WASocket, proto } from '@whiskeysockets/baileys';
+import type { WASocket, proto } from 'baileys';
 
 export enum SessionStatus {
   STARTING = 'starting',

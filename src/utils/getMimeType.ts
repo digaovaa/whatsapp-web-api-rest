@@ -1,4 +1,4 @@
-import {proto} from "@whiskeysockets/baileys";
+import {proto} from "baileys";
 
 export function getMimeType(doc: proto.Message.IDocumentMessage): string {
     if (doc.fileName) {

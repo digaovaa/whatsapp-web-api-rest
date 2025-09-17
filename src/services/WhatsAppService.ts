@@ -2,7 +2,7 @@ import {sessionManager} from '../core/sessions/SessionManager';
 import {SessionStatus} from '../core/types';
 import logger from '../utils/logger';
 import mime from "mime-types";
-import {AnyMediaMessageContent, proto, WAMediaUpload} from "@whiskeysockets/baileys";
+import {AnyMediaMessageContent, proto, WAMediaUpload} from "baileys";
 
 export class WhatsAppService {
 

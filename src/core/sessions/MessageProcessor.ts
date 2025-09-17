@@ -1,4 +1,4 @@
-import { downloadMediaMessage, getContentType, proto, WAMessageKey } from '@whiskeysockets/baileys';
+import { downloadMediaMessage, getContentType, proto, WAMessageKey } from 'baileys';
 import { MessageEvent, SessionInfo } from '../types';
 import logger from '../../utils/logger';
 import { createWriteStream } from "node:fs";

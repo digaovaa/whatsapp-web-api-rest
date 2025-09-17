@@ -9,7 +9,7 @@ import {
     WAMessageContent,
     WAMessageKey,
     WASocket
-} from '@whiskeysockets/baileys';
+} from 'baileys';
 import { useMySQLAuthState } from 'mysql-baileys';
 import qrcode from 'qrcode';
 import { mysqlConfig } from '../../config/env';
