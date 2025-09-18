@@ -35,7 +35,7 @@ export class SessionFactory {
                 user: mysqlConfig.MYSQL_USER,
                 password: mysqlConfig.MYSQL_PASSWORD,
                 database: mysqlConfig.MYSQL_DATABASE,
-                tableName: "auth"
+                tableName: mysqlConfig.MYSQL_TABLE
             });
 
             this.removeSessionFunctions.set(sessionId, removeCreds);
@@ -43,7 +43,7 @@ export class SessionFactory {
                 printQRInTerminal: false,
                 auth: {
                     creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, logger),
+                    keys: state.keys,
                 },
                 browser: Browsers.macOS("Chrome"),
                 logger,

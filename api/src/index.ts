@@ -3,9 +3,11 @@ import logger from './utils/logger';
 import {sessionRestoreService} from './core/sessions/SessionRestoreService';
 import "./services/WebhookService";
 import { port } from './config/env';
+import { initializeDatabase } from './core/database/init';
 
 const startServer = async () => {
     try {
+        await initializeDatabase();
         await sessionRestoreService.restoreAllSessions();
 
         app.listen(port, () => {

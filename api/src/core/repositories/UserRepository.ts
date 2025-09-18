@@ -21,7 +21,8 @@ class UserRepository {
 
 
             await connection.execute(
-                `INSERT INTO users (sessionId, userId) VALUES (?, ?)`,
+                `INSERT INTO users (sessionId, userId) VALUES (?, ?)
+                 ON DUPLICATE KEY UPDATE userId = VALUES(userId)`,
                 [sessionId, userId]
             );
 

@@ -64,6 +64,6 @@ export interface MessageEvent {
 export enum WebhookEventType {
   SESSION_UPDATE = 'session_update',
   QR_CODE = 'qr_code',
-  MESSAGE = 'message',
-  MESSAGE_ACK = 'message_ack'
+  MESSAGE = 'incoming',
+  MESSAGE_ACK = 'incoming.ack'
 }

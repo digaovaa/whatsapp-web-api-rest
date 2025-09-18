@@ -31,7 +31,7 @@ class GoogleStorageService {
 
             const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${destination}`;
 
-            logger.info('File uploaded successfully:', publicUrl);
+            logger.info('File uploaded successfully: ' + publicUrl);
 
             return {
                 success: true,

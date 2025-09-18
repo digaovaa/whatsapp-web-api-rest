@@ -52,7 +52,7 @@ export class SessionRestoreService {
                 database: mysqlConfig.MYSQL_DATABASE
             });
 
-            const [rows] = await connection.execute<RowDataPacket[]>('SELECT DISTINCT session as sessionId FROM auth');
+            const [rows] = await connection.execute<RowDataPacket[]>(`SELECT DISTINCT session as sessionId FROM ${mysqlConfig.MYSQL_TABLE}`);
 
             await connection.end();
 
