@@ -63,6 +63,7 @@ export class WebhookService {
         data: any
     ): Promise<boolean> {
         try {
+            console.log("ACHEI",JSON.stringify(data,null,2));
             const ch = await this.ensureChannel();
             const exchange = rabbitConfig.AMQP_EXCHANGE;
             const routingKey = `${rabbitConfig.AMQP_EXCHANGE}.baileys.${eventType}`;
@@ -108,7 +109,7 @@ export class WebhookService {
     private async handleMessageEvent(event: MessageEvent): Promise<void> {
         const payload = {
             InstanceID: event.sessionId,
-            CompanyID: event.userId,
+            CompanyID: event.companyId,
             Payload: event.message,
             WhatsappID: event.from
         };

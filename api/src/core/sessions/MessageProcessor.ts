@@ -96,12 +96,13 @@ export class MessageProcessor {
             return {
                 sessionId: sessionInfo.id,
                 userId: sessionInfo.userId,
+                companyId: sessionInfo.companyId,
                 messageType: messageType as any,
                 message,
                 timestamp: message.messageTimestamp
                     ? typeof message.messageTimestamp === 'number'
                         ? message.messageTimestamp
-                        : Number(message.messageTimestamp)
+                        : Number(message.messageTimestamp.low)
                     : Date.now() / 1000,
                 from,
                 content

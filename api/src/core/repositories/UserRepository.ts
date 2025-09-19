@@ -54,9 +54,9 @@ class UserRepository {
 
 
             await connection.execute(
-                `INSERT INTO users (Name, Token) VALUES (?, ?)
+                `INSERT INTO users (Token) VALUES (?)
                  ON DUPLICATE KEY UPDATE Name = VALUES(Name)`,
-                [userId, sessionId]
+                [sessionId]
             );
 
             await connection.end();

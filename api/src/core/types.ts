@@ -16,6 +16,7 @@ export interface SessionInfo {
   userId: string;
   createdAt: Date;
   lastUsed: Date;
+  companyId: number;
   qr?: string | null;
 }
 
@@ -40,6 +41,7 @@ export interface MessageEvent {
   sessionId: string;
   userId: string;
   messageType: 'text' | 'image' | 'video' | 'audio' | 'document' | 'location' | 'contact' | 'sticker' | 'unknown';
+  companyId: number;
   message: proto.IWebMessageInfo;
   timestamp: number;
   from: string;

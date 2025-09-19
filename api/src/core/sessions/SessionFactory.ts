@@ -221,18 +221,20 @@ export class SessionFactory {
             }
 
             socket.ev.on('creds.update', async () => {
-                await userRepository.add(sessionInfo.userId, sessionId);
+                // await userRepository.add(sessionInfo.userId, sessionId);
                 saveCreds();
             });
 
             socket.ev.on('messages.upsert', async ({ messages, type }) => {
-                if (type !== 'notify') return;
-
+                if (!['notify', 'append'].includes(type)) {
+                    logger.debug({ sessionId, type }, 'Ignoring message notification type');
+                    return;
+                }
                 for (const message of messages) {
                     const processedMessage = await MessageProcessor.processMessage(socket, message, sessionInfo);
 
                     if (processedMessage) {
-                        EventEmitter.emitMessage({ ...processedMessage, userId: sessionInfo.userId });
+                        EventEmitter.emitMessage({ ...processedMessage, userId: sessionInfo.userId, companyId: sessionInfo.companyId });
                     }
                 }
             });

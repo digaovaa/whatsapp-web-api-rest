@@ -3,6 +3,7 @@ import { EventEmitter } from '../events/EventEmitter';
 import { SessionFactory } from './SessionFactory';
 import NodeCache from 'node-cache';
 import logger from '../../utils/logger';
+import { userRepository } from '../repositories/UserRepository';
 
 
 export class SessionManager {
@@ -28,14 +29,20 @@ export class SessionManager {
 
   public async startSession(userId: string, sessionId: string): Promise<SessionInfo> {
     try {
+      const user = await userRepository.getByToken(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+
       const sessionInfo: SessionInfo = {
         id: sessionId,
         userId,
         status: SessionStatus.STARTING,
         createdAt: new Date(),
-        lastUsed: new Date()
+        lastUsed: new Date(),
+        companyId: user.companyId ?? 0
       };
-
+      
       const socket = await this.sessionFactory.createSession(sessionInfo, (qrCode) => {
         sessionInfo.qr = qrCode;
         sessionInfo.status = SessionStatus.SCANNING_QR;
