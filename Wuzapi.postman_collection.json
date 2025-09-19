@@ -1,0 +1,1605 @@
+{
+	"info": {
+		"_postman_id": "0e5d22cf-f00f-4cd4-8ec1-cccd1c74eb04",
+		"name": "Wuzapi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28826281"
+	},
+	"item": [
+		{
+			"name": "Groups",
+			"item": [
+				{
+					"name": "List Groups",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/group/list",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"group",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"GroupJID\": \"120363121590292071@g.us\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/group/info",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"group",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group Invite link",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"GroupJID\": \"120363121590292071@g.us\",\r\n    \"Reset\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/group/invitelink",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"group",
+								"invitelink"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Group Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"GroupName\": \"GOLINK Group\",\r\n    \"Participants\": [\r\n        \"555193811607\",\r\n        \"555137931216\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/group/create",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"group",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat",
+			"item": [
+				{
+					"name": "Send Revoke Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"ID\": \"3EB054A400CC765A00632F\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/revoke",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"revoke"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send React Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"ID\": \"3EB0C03535122FCFE28EDF\",\r\n  \"Body\": \"👍🏼\",\r\n  \"FromMe\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/react",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"react"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Chat Presence",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607@s.whatsapp.net\",\r\n  \"State\": \"composing\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/presence",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"presence"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Text Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"Body\": \"tipo o certinho 👍 5\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/text",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"text"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Edit Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607@s.whatsapp.net\",\r\n  \"Body\": \"Enviando pela meow EDITADO2 👍\",\r\n  \"Id\": \"3EB00C2BE467469190E693\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/edit",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"edit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Image Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Phone\": \"555193811607\",\r\n    \"FileURL\": \"https://obj-sp1.gravscale.com/talkdev-bucket/company1/contacts/52226.jpeg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/image",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"image"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send List Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Phone\": \"555193811607@s.whatsapp.net\",\r\n    \"Title\": \"Titulo da Lista\",\r\n    \"Desc\": \"Esta é a descrição de uma lista\",\r\n    \"ButtonText\": \"Escolha uma opção\",\r\n    \"TopText\": \"Teste Lista TopText\",\r\n    \"FooterText\": \"\",\r\n    \"Sections\": [\r\n        {\r\n            \"Title\": \"Seguem opções\",\r\n            \"Rows\": [\r\n                {\r\n                    \"RowId\": \"opt1\",\r\n                    \"Title\": \"OPção 1\"\r\n                },\r\n                {\r\n                    \"RowId\": \"opt2\",\r\n                    \"Title\": \"OPção 2\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/list",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Audio Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Phone\": \"555193811607\",\r\n    \"FileURL\": \"http://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/audio",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"audio"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Document Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"FileName\": \"teste.txt\",\r\n  \"FileURL\": \"https://example-files.online-convert.com/document/txt/example.txt\",\r\n  \"Caption\": \"TESTE TEXTO\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/document",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"document"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Video Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"FileName\": \"teste.mp4\",\r\n  \"FileURL\": \"http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4\",\r\n  \"Caption\": \"TESTE TEXTO\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/video",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"video"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Contact Message",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Phone\": \"555193811607\",\r\n    \"VCard\": {\r\n        \"ContactName\": \"Amor\",\r\n        \"ContactPhone\": \"555197199845\"\r\n    },\r\n    \"IsForwarded\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/contact",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"contact"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "HistorySync",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"MessageID\" : \"3EB03FFF2AD500C27D6C26\",\r\n  \"Chat\": \"555137931216@s.whatsapp.net\",\r\n  \"IsFromMe\": false,\r\n  \"Timestamp\": \"2025-02-25T13:11:02-03:00\",\r\n  \"IsGroup\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/historysync",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"historysync"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeFromMe",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"ID\": \"3EB0A0935CFB4F31963E41\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/removeFromMe",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"removeFromMe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send call",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{token}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "query",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "secret",
+								"value": "LUkJlNONri6t3Etp",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607@s.whatsapp.net\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/call",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"call"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Buttons",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"Id\": \"1\",\r\n  \"Title\": \"Message title\",\r\n  \"Buttons\": [\r\n    {\r\n      \"ButtonId\": \"1\",\r\n      \"ButtonText\": \"Yes\",\r\n      \"Type\": \"1\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/chat/send/buttons",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"chat",
+								"send",
+								"buttons"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "UserInfo",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": [\r\n    \"120363300723300037\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/info",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check User",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": [\r\n    \"555193811607\",\r\n    \"555197199845\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/check",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Avatar",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{token}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "token",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555193811607\",\r\n  \"Preview\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/avatar",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"avatar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contacts",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/contacts",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"contacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lid",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/lid",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"lid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Jid",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/jid",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"jid"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Webhook",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"WebhookURL\": \"https://skinny-planet-16.webhook.cool\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/webhook",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Session Webhook",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/webhook",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"webhook"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Session",
+			"item": [
+				{
+					"name": "Session Status",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/session/status",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"session",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get QR",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/session/qr",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"session",
+								"qr"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PairPhone",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Phone\": \"555137931216\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/session/pairphone",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"session",
+								"pairphone"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/session/logout",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"session",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Disconnect",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/session/disconnect",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"session",
+								"disconnect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reconnect",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/session/reconnect",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"session",
+								"reconnect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Connect",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Subscribe\": [\r\n    \"All\"\r\n  ],\r\n  \"Immediate\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/session/connect",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"session",
+								"connect"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Company",
+			"item": [
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "token_company",
+								"value": "{{token_company}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"AcceptAudios\": true,\r\n    \"AcceptVideos\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/update/:token",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"update",
+								":token"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Users Delete by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token_company",
+								"value": "{{token_company}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/users/delete/:id",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"delete",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Users Delete by Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token_company",
+								"value": "{{token_company}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/users/delete/:token",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"delete",
+								":token"
+							],
+							"variable": [
+								{
+									"key": "token",
+									"value": "TESTsdadaasasaslkdoapjad"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Users Create",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token_company",
+								"value": "{{token_company}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Token\": \"novotoken2123\",\r\n  \"Name\": \"TESTsdadaasasaslkdoapjadasdasdasa\",\r\n  \"WhatsappId\": 3,\r\n  \"Events\": \"Message\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/users/create",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"users",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Master",
+			"item": [
+				{
+					"name": "Company create",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "SECRET_KEY",
+								"value": "TOGITALKGOLINK",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Token\": \"AokhbGciOBar7I1NiJ9eyAslkjO982G3a4SAd\",\r\n  \"Name\": \"DELIVERY1\",\r\n  \"RedisUri\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/company/create",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"company",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count Connected",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "SECRET_KEY",
+								"value": "TOGITALKGOLINK",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/count/connect",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"count",
+								"connect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BFF-remove-server",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{secret_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{secret_key}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}/maintenance/remove-server?url=http%3A%2F%2Fapiplaylive_04%3A8080",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"maintenance",
+								"remove-server"
+							],
+							"query": [
+								{
+									"key": "url",
+									"value": "http%3A%2F%2Fapiplaylive_04%3A8080"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BFF-Add Server",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{secret_key}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "{{secret_key}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"url\": \"http://apiplaylive_04:8080\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/maintenance/add-server",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"maintenance",
+								"add-server"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "ecb20fce-e374-4dfd-bf78-da890ce333a6"
+		},
+		{
+			"key": "baseURL",
+			"value": "https://delivery1.togiti.com.br"
+		},
+		{
+			"key": "token_company",
+			"value": "AokhbGciOBar7I1NiJ9eyAslkjO982G3a4SAd"
+		},
+		{
+			"key": "secret_key",
+			"value": "TOGITALKGOLINK"
+		}
+	]
+}

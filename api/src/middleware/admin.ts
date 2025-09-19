@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import  logger  from '../utils/logger';
 
 /**
  * Admin authorization middleware
@@ -7,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 export const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
   // Check if user is authenticated and has admin role
   const user = (req as any).user;
-  
+  logger.info({ user }, 'User found');
   if (!user) {
     res.status(403).json({
       success: false,

@@ -2,12 +2,13 @@ import { Router } from 'express';
 import { sessionController } from '../controllers/SessionController';
 import { isAuthenticated } from '../middleware/auth';
 import { isAdmin } from '../middleware/admin';
+import { authCompany } from '../middleware/authCompany';
 
 const router = Router();
 
 router.post(
   '/sessions',
-  isAuthenticated,
+  authCompany,
   sessionController.createSession
 );
 
@@ -37,8 +38,7 @@ router.get(
 
 router.get(
   '/admin/sessions',
-  isAuthenticated,
-  isAdmin,
+  authCompany,
   sessionController.listAllSessions
 );
 

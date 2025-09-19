@@ -6,7 +6,7 @@ import { userRepository } from '../repositories/UserRepository';
 
 export type Session = {
     sessionId: string;
-    userId: string;
+    token: string;
 }
 
 export class SessionRestoreService {
@@ -30,9 +30,9 @@ export class SessionRestoreService {
 
             for (const session of sessions) {
                 try {
-                    const { sessionId, userId } = session;
-                    logger.info({ sessionId, userId }, 'Restoring session');
-                    await sessionManager.startSession(userId, sessionId);
+                    const { sessionId, token } = session;
+                    logger.info({ sessionId, token }, 'Restoring session');
+                    await sessionManager.startSession(token, sessionId);
                 } catch (error) {
                     logger.error({ error, sessionId: session.sessionId }, 'Failed to restore session');
                 }
@@ -65,7 +65,7 @@ export class SessionRestoreService {
 
             for (const row of rows) {
                 const userId = await userRepository.findBySessionId(row.sessionId);
-
+                logger.info({ userId }, 'User found for session');
                 if (!userId) {
                     logger.warn({ sessionId: row.sessionId }, 'No user found for session');
                     continue;
@@ -73,7 +73,7 @@ export class SessionRestoreService {
 
                 result.push({
                     sessionId: row.sessionId,
-                    userId: userId.userId,
+                    token: userId.token,
                 });
             }
 

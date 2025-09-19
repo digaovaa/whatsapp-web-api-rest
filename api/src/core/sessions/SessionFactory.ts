@@ -18,6 +18,7 @@ import { EventEmitter } from '../events/EventEmitter';
 import { userRepository } from '../repositories/UserRepository';
 import { SessionInfo, SessionStatus } from '../types';
 import { MessageProcessor } from './MessageProcessor';
+import { messagesRepository } from '../repositories/MessagesRepository';
 
 export class SessionFactory {
 
@@ -56,7 +57,9 @@ export class SessionFactory {
                 transactionOpts: { maxCommitRetries: 10, delayBetweenTriesMs: 1000 },
                 getMessage: async (msg: WAMessageKey): Promise<WAMessageContent | undefined> => {
                     //TODO: Retrieve messages from some database, the messages has to be saved on "messages.upsert" event
-                    return { conversation: 'hello' };
+                    const message = await messagesRepository.get(msg.id ?? '', sessionId);
+                    logger.info({ message }, 'Message retrieved from store database');
+                    return message;
                 },
                 shouldIgnoreJid: (jid) => isJidGroup(jid) || isJidBroadcast(jid) || isJidNewsletter(jid)
             });

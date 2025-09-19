@@ -7,7 +7,7 @@ export default function Session() {
   const [info, setInfo] = useState<any>(null)
 
   async function fetchJSON<T>(url: string): Promise<T> {
-    const res = await fetch(url, { headers: { 'Authorization': localStorage.getItem('admin_token') || '' } })
+    const res = await fetch(url, { headers: { 'token_company': localStorage.getItem('token_company') || '' } })
     if (!res.ok) throw new Error(await res.text())
     return res.json()
   }
@@ -28,7 +28,7 @@ export default function Session() {
 
   return (
     <div className="wrap">
-      <p><Link to="/admin">← Voltar</Link></p>
+      <p><Link to="/">← Voltar</Link></p>
       <h2>Conexão: {sessionId}</h2>
       {qr && <img src={qr} alt="QR Code" style={{ maxWidth: 240 }} />}
       <pre>{JSON.stringify(info, null, 2)}</pre>

@@ -4,6 +4,7 @@ import {sessionRestoreService} from './core/sessions/SessionRestoreService';
 import "./services/WebhookService";
 import { port } from './config/env';
 import { initializeDatabase } from './core/database/init';
+import { messageCleanupService } from './services/MessageCleanupService';
 
 const startServer = async () => {
     try {
@@ -13,6 +14,7 @@ const startServer = async () => {
         app.listen(port, () => {
             logger.info(`WhatsApp API server running on port ${port}`);
         });
+        messageCleanupService.start();
         
     } catch (error) {
         logger.error({error}, 'Failed to start server');

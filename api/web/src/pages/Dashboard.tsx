@@ -12,7 +12,7 @@ export default function Dashboard() {
   const [userId, setUserId] = useState('')
   const [sessionId, setSessionId] = useState('')
   const [endpoints, setEndpoints] = useState<string>('')
-  const [adminToken, setAdminToken] = useState<string>(localStorage.getItem('admin_token') || '')
+  const [adminToken, setAdminToken] = useState<string>(localStorage.getItem('token_company') || '')
   const [tokenInput, setTokenInput] = useState<string>('')
 
   async function fetchJSON<T>(url: string, opts?: RequestInit): Promise<T> {
@@ -20,7 +20,7 @@ export default function Dashboard() {
       ...opts,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': localStorage.getItem('admin_token') || '',
+        'token_company': localStorage.getItem('token_company') || '',
         ...(opts?.headers || {})
       }
     })
@@ -43,18 +43,17 @@ export default function Dashboard() {
   function saveToken() {
     const clean = tokenInput.trim()
     if (!clean) {
-      alert('Informe o token do admin')
+      alert('Informe o token da empresa')
       return
     }
-    const value = clean.startsWith('Bearer ') ? clean : `Bearer ${clean}`
-    localStorage.setItem('admin_token', value)
-    setAdminToken(value)
+    localStorage.setItem('token_company', clean)
+    setAdminToken(clean)
     setTokenInput('')
     void load()
   }
 
   function clearToken() {
-    localStorage.removeItem('admin_token')
+    localStorage.removeItem('token_company')
     setAdminToken('')
     setSessions([])
     setEndpoints('')
@@ -83,7 +82,7 @@ export default function Dashboard() {
       <div className="container">
         <header>
           <div className="title">Admin • WhatsApp API</div>
-          <nav className="muted">Informe seu admin_token</nav>
+          <nav className="muted">Informe seu token_company</nav>
         </header>
         <div className="grid">
           <div className="card">
@@ -91,13 +90,13 @@ export default function Dashboard() {
             <div className="section">
               <div className="row" style={{ marginBottom: 12 }}>
                 <input
-                  placeholder="admin_token"
+                  placeholder="token_company"
                   value={tokenInput}
                   onChange={e => setTokenInput(e.target.value)}
                 />
                 <button onClick={saveToken}>Salvar token</button>
               </div>
-              <div className="hint">Dica: use Authorization: Bearer &lt;token&gt;</div>
+              <div className="hint">Dica: preencha o token da empresa</div>
             </div>
           </div>
         </div>

@@ -24,7 +24,7 @@ export class WhatsAppService {
         sessionId: string,
         to: string,
         text: string
-    ): Promise<any> {
+    ): Promise<proto.WebMessageInfo | undefined> {
         const session = sessionManager.getSession(sessionId);
 
         if (!session) {
@@ -179,7 +179,7 @@ export class WhatsAppService {
         longitude: number,
         name?: string,
         address?: string
-    ): Promise<any> {
+    ): Promise<proto.WebMessageInfo | undefined> {
         const session = sessionManager.getSession(sessionId);
 
         if (!session) {
@@ -221,7 +221,7 @@ export class WhatsAppService {
             organization?: string,
             email?: string
         }
-    ): Promise<any> {
+    ): Promise<proto.WebMessageInfo | undefined> {
         try {
             const session = sessionManager.getSession(sessionId);
 
@@ -405,6 +405,41 @@ END:VCARD`;
         } catch (error) {
             logger.debug({error, sessionId, phoneNumber}, 'Failed to get user status');
             return null;
+        }
+    }
+
+    public async editMessage(
+        sessionId: string,
+        phoneNumber: string,
+        body: string,
+        id: string
+    ): Promise<any> {
+        const session = sessionManager.getSession(sessionId);
+
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        if (session.info.status !== SessionStatus.CONNECTED) {
+            throw new Error(`Session is not connected (current status: ${session.info.status})`);
+        }
+
+        try {
+            const formattedNumber = this.formatPhoneNumber(phoneNumber);
+            const result = await session.socket.sendMessage(formattedNumber, {
+                text: body,
+                edit: {
+                    id: id,
+                    fromMe: true,
+                    remoteJid: formattedNumber
+                }
+            });
+            session.info.lastUsed = new Date();
+
+            return result;
+        } catch (error) {
+            logger.error({error, sessionId, phoneNumber, body, id}, 'Failed to edit message');
+            throw error;
         }
     }
 }

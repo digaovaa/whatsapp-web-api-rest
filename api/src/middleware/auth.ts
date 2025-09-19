@@ -11,8 +11,8 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
   // - Session-based auth
   // - OAuth, etc.
   
-  // For now, we'll assume a token in the header
-  const authHeader = req.headers.authorization;
+  // Para compatibilidade com a coleção Postman, aceite Authorization ou header `token`/`Token`.
+  const authHeader = req.headers.authorization || (req.headers['token'] as string) || (req.headers['Token'] as unknown as string);
   
   if (!authHeader) {
     res.status(401).json({
